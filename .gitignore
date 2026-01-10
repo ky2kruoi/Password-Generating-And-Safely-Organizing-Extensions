@@ -1,0 +1,11 @@
+# Dữ liệu mật khẩu cá nhân - TUYỆT ĐỐI KHÔNG PUSH
+vault.json
+
+# Các tệp tạm của Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Môi trường ảo (nếu có)
+venv/
+.env

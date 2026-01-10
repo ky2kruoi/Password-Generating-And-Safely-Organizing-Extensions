@@ -1,8 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_cors import CORS
-import auth
-import crypto_utils
-import generator
+from backend import auth, crypto_utils, generator
 from datetime import datetime
 
 app = Flask(__name__)

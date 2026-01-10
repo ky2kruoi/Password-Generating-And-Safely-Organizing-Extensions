@@ -7,37 +7,44 @@
 <body>
     <div class="container">
         <h2 class="title">PassManager 🛡️</h2>
-        <div id="login-section">
+
+        <div id="setup-section" style="display: none;">
+            <p style="font-size: 12px; color: #666; text-align: center;">Chào mừng! Hãy tạo Khóa Chủ lần đầu.</p>
+            <input type="password" id="setup-key" placeholder="Nhập Khóa Chủ mới">
+            <input type="password" id="setup-confirm" placeholder="Xác nhận Khóa Chủ">
+            <button id="setup-btn" class="btn btn-primary">Khởi tạo Kho Khóa</button>
+        </div>
+
+        <div id="login-section" style="display: none;">
             <input type="password" id="master-key-input" placeholder="Nhập Khóa Chủ...">
             <button id="login-btn" class="btn btn-primary">Mở Kho Khóa</button>
             <p id="error-msg" class="error"></p>
         </div>
+
         <div id="vault-section" style="display: none;">
             <div class="tabs">
                 <button class="tab-btn active" id="tab-list">Kho khóa</button>
-                <button class="tab-btn" id="tab-gen">Thêm mật khẩu</button>
+                <button class="tab-btn" id="tab-gen">Thêm mới</button>
             </div>
+            
             <div id="list-content">
-                <div class="actions" style="text-align: right; margin-bottom: 10px;">
+                <div style="text-align: right; margin-bottom: 10px;">
                     <button id="logout-btn" class="btn btn-danger">Đăng xuất</button>
                 </div>
                 <div id="password-list" class="list-container"></div>
             </div>
+
             <div id="gen-content" style="display: none;">
                 <div class="add-form">
-                    <div class="form-group"><label>Tên dịch vụ</label><input type="text" id="ext-service" placeholder="VD: Facebook, Gmail..."></div>
-                    <div class="form-group"><label>Tên đăng nhập / Email</label><input type="text" id="ext-username"></div>
-                    <div class="form-group">
-                        <label>Lựa chọn kiểu mật khẩu</label>
-                        <select id="ext-password-type">
-                            <option value="complex">Ký tự phức tạp (H9@kL#m1...)</option>
-                            <option value="passphrase">Passphrase NIST (Apple-River...)</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label>Mật khẩu</label><input type="text" id="ext-password-field" placeholder="Nhập hoặc tạo bên dưới"></div>
-                    <button id="ext-gen-btn" class="btn btn-light">✨ Tạo mật khẩu tự động</button>
-                    <button id="ext-save-btn" class="btn btn-primary">Lưu mật khẩu</button>
-                    <p id="save-status"></p>
+                    <input type="text" id="ext-service" placeholder="Tên dịch vụ (VD: Facebook)">
+                    <input type="text" id="ext-username" placeholder="Tên đăng nhập">
+                    <select id="ext-password-type">
+                        <option value="complex">Ký tự phức tạp</option>
+                        <option value="passphrase">Cụm từ NIST</option>
+                    </select>
+                    <input type="text" id="ext-password-field" placeholder="Mật khẩu">
+                    <button id="ext-gen-btn" class="btn btn-light">✨ Tạo tự động</button>
+                    <button id="ext-save-btn" class="btn btn-primary">Lưu bảo mật</button>
                 </div>
             </div>
         </div>

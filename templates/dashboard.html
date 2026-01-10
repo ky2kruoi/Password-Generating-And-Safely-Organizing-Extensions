@@ -3,155 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý mật khẩu - Dashboard</title>
-    <style>
-        /* CSS Hiện đại đã nâng cấp */
-        body { 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-            background-color: #f0f2f5; 
-            color: #1a1a1a;
-            margin: 0;
-            padding: 40px;
-        }
-
-        .container { 
-            max-width: 1000px; 
-            margin: auto; 
-            background: white; 
-            padding: 40px; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
-        }
-
-        h2 { font-weight: 800; letter-spacing: -0.02em; margin-bottom: 30px; color: #111827; border-bottom: 2px solid #2563eb; padding-bottom: 10px; display: inline-block; }
-
-        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-
-        .btn { 
-            display: inline-flex;
-            align-items: center;
-            padding: 10px 20px; 
-            border-radius: 8px; 
-            text-decoration: none; 
-            font-size: 14px; 
-            font-weight: 600;
-            cursor: pointer; 
-            border: none; 
-            transition: all 0.2s ease; 
-        }
-
-        .btn-add { background-color: #2563eb; color: white; }
-        .btn-add:hover { background-color: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
-
-        .btn-view { background-color: #f1f5f9; color: #475569; }
-        .btn-view:hover { background-color: #e2e8f0; color: #0f172a; }
-
-        .btn-logout { color: #6b7280; font-size: 14px; text-decoration: none; }
-        .btn-logout:hover { color: #111827; }
-
-        /* Bảng dữ liệu chuyên nghiệp */
-        .table-container {
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            overflow: hidden;
-            background: white;
-        }
-
-        table { width: 100%; border-collapse: collapse; }
-        th { background-color: #f9fafb; color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; padding: 16px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-        td { padding: 16px; border-bottom: 1px solid #f3f4f6; font-size: 15px; }
-        tr:last-child td { border-bottom: none; }
-        tr:hover { background-color: #f8fafc; }
-
-        /* Vùng giải mã mật khẩu */
-        #result-box { 
-            margin-bottom: 25px; 
-            padding: 20px; 
-            background-color: #f0fdf4; 
-            border: 1px solid #bbf7d0; 
-            border-radius: 12px; 
-            display: none; 
-            animation: slideDown 0.3s ease-out;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .pwd-display { font-family: 'Courier New', Courier, monospace; font-weight: bold; color: #166534; font-size: 1.1rem; }
-        .copy-btn { background-color: #166534; color: white; margin-left: 15px; }
-        .btn-delete { color: #ef4444; font-weight: 600; margin-left: 15px; text-decoration: none; font-size: 13px; }
-    </style>
+    <title>Dashboard - PassManager Secured</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
-
-<div class="container">
-    <h2>Kho Mật Khẩu Bảo Mật</h2>
-    
-    <div class="header-actions">
-        <a href="/add" class="btn btn-add">+ Thêm mật khẩu mới</a>
-        <a href="/logout" class="btn-logout">Đăng xuất</a>
-    </div>
-
-    <div id="result-box">
-        <div>
-            <strong>Mật khẩu:</strong> 
-            <span id="pwd-text" class="pwd-display"></span>
-            <button class="btn copy-btn" onclick="copyToClipboard()">Copy</button>
+    <div class="container">
+        <div class="header-actions">
+            <div>
+                <h2>Kho Mật Khẩu</h2>
+                <p style="color: var(--text-muted); margin: 0;">Quản lý tài khoản an toàn của bạn</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="/add" class="btn btn-primary">
+                    <i class="ph-plus-bold"></i> Thêm mới
+                </a>
+                <a href="/logout" class="btn btn-outline">
+                    <i class="ph-sign-out"></i> Đăng xuất
+                </a>
+            </div>
         </div>
-        <button onclick="document.getElementById('result-box').style.display='none'" style="cursor:pointer; border:none; background:none; font-size: 1.2rem;">✕</button>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="alert alert-success">
+                <i class="ph-check-circle-bold"></i>
+                {% for message in messages %}{{ message }}{% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <div class="dashboard-card">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="padding-left: 30px;">Dịch vụ / Ứng dụng</th>
+                            <th>Tên đăng nhập</th>
+                            <th>Ngày tạo</th>
+                            <th style="text-align: right; padding-right: 30px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if entries|length == 0 %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                                <i class="ph-folder-open-thin" style="font-size: 48px; margin-bottom: 10px; display: block;"></i>
+                                Chưa có mật khẩu nào được lưu. Hãy thêm mới!
+                            </td>
+                        </tr>
+                        {% else %}
+                            {% for entry in entries %}
+                            <tr>
+                                <td style="padding-left: 30px;">
+                                    <strong>{{ entry.service_name }}</strong>
+                                </td>
+                                <td>
+                                    <span style="font-family: monospace; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">{{ entry.username }}</span>
+                                </td>
+                                <td style="color: var(--text-muted); font-size: 0.9rem;">
+                                    {{ entry.created_at[:10] }}
+                                </td>
+                                <td>
+                                    <div class="actions-cell" style="justify-content: flex-end; padding-right: 15px;">
+                                        <button onclick="viewPass('{{ entry.id }}')" class="btn btn-outline btn-sm" title="Xem & Copy Mật khẩu">
+                                            <i class="ph-eye-bold"></i> Xem
+                                        </button>
+                                        <a href="/delete/{{ entry.id }}" class="btn btn-danger" onclick="return confirm('Bạn có chắc muốn xóa mật khẩu này không? Hành động này không thể hoàn tác.')" title="Xóa mục này">
+                                            <i class="ph-trash-bold"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Dịch vụ</th>
-                    <th>Tên đăng nhập</th>
-                    <th>Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in entries %}
-                <tr>
-                    <td><strong>{{ entry.service_name }}</strong></td>
-                    <td>{{ entry.username }}</td>
-                    <td>
-                        <button onclick="viewPass({{ loop.index0 }})" class="btn btn-view">Xem Pass</button>
-                        <a href="/delete/{{ loop.index0 }}" class="btn-delete" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">Xóa</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<script>
-    // Hàm giải mã mật khẩu bằng AJAX
-    async function viewPass(idx) {
-        try {
-            const response = await fetch(`/view/${idx}`);
-            const data = await response.json();
+    <div id="passwordModal" class="modal-overlay">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <i class="ph-shield-check-fill" style="font-size: 40px; color: var(--accent-color); margin-bottom: 10px;"></i>
+            <h3>Mật khẩu đã giải mã</h3>
+            <p style="color: var(--text-muted);">Đây là mật khẩu của bạn. Hãy cẩn thận khi chia sẻ.</p>
             
-            if (data.password) {
-                const box = document.getElementById('result-box');
-                document.getElementById('pwd-text').innerText = data.password;
-                box.style.display = 'flex';
-            } else {
-                alert("Không thể giải mã!");
+            <div class="pwd-display-box">
+                <span id="pwd-text">Fetching...</span>
+                <button class="btn btn-sm btn-outline" onclick="copyToClipboard()" title="Copy">
+                    <i class="ph-copy-bold"></i>
+                </button>
+            </div>
+            <button onclick="closeModal()" class="btn btn-primary btn-sm" style="width: auto; padding-left: 30px; padding-right: 30px;">Đóng lại</button>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('passwordModal');
+        const pwdText = document.getElementById('pwd-text');
+
+        function closeModal() {
+            modal.style.display = 'none';
+            pwdText.innerText = ''; // Xóa text khi đóng để bảo mật
+        }
+
+        async function viewPass(entryId) {
+            modal.style.display = 'flex'; // Hiện modal
+            pwdText.innerText = "Đang giải mã...";
+            try {
+                const response = await fetch(`/view/${entryId}`);
+                if (response.status === 401) {
+                    alert("Phiên làm việc hết hạn, vui lòng đăng nhập lại.");
+                    window.location.href = "/login";
+                    return;
+                }
+                const data = await response.json();
+                if (data.password) {
+                    pwdText.innerText = data.password;
+                } else {
+                    pwdText.innerText = "Lỗi: Không thể giải mã!";
+                }
+            } catch (e) {
+                pwdText.innerText = "Lỗi kết nối server!";
             }
-        } catch (e) { alert("Lỗi kết nối server!"); }
-    }
+        }
 
-    // Hàm copy mật khẩu
-    function copyToClipboard() {
-        const text = document.getElementById('pwd-text').innerText;
-        navigator.clipboard.writeText(text).then(() => {
-            alert("Đã sao chép vào bộ nhớ tạm!");
+        function copyToClipboard() {
+             const text = pwdText.innerText;
+             if(text && text !== "Đang giải mã..." && !text.startsWith("Lỗi")) {
+                 navigator.clipboard.writeText(text).then(() => {
+                     alert("Đã copy mật khẩu vào bộ nhớ tạm!");
+                 });
+             }
+        }
+        
+        // Đóng modal khi click ra ngoài
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) closeModal();
         });
-    }
-</script>
-
+    </script>
 </body>
 </html>

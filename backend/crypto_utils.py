@@ -9,33 +9,29 @@ def derive_key(master_key: str, salt: bytes):
         algorithm=hashes.SHA256(),
         length=32,
         salt=salt,
-        iterations=100000,
+        iterations=100000, # Độ an toàn cao
     )
     return kdf.derive(master_key.encode())
 
 def encrypt_data(master_key: str, plaintext: str):
-    """Mã hóa mật khẩu dịch vụ"""
-    # 1. Tạo Salt và IV ngẫu nhiên
+    """Mã hóa mật khẩu với Salt và IV riêng biệt cho mỗi entry"""
     salt = os.urandom(16)
     iv = os.urandom(12) 
     
-    # 2. Tạo khóa mã hóa từ Khóa Chủ
     key = derive_key(master_key, salt)
     aesgcm = AESGCM(key)
     
-    # 3. Mã hóa
-    ciphertext = aesgcm.encrypt(iv, plaintext.encode(), None)
+    # AESGCM.encrypt sẽ trả về ciphertext + tag (16 bytes cuối)
+    ciphertext_with_tag = aesgcm.encrypt(iv, plaintext.encode(), None)
     
-    # Trả về các thành phần để lưu vào JSON (dưới dạng hex để dễ lưu trữ)
     return {
-        "ciphertext": ciphertext.hex(),
+        "ciphertext": ciphertext_with_tag.hex(),
         "iv": iv.hex(),
-        "salt": salt.hex(), # Cần thêm salt riêng cho mỗi mục nhập
-        "tag": ciphertext[-16:].hex() # AES-GCM tag nằm ở cuối ciphertext
+        "salt": salt.hex()
     }
 
 def decrypt_data(master_key: str, enc_dict: dict):
-    """Giải mã mật khẩu dịch vụ"""
+    """Giải mã mật khẩu"""
     try:
         salt = bytes.fromhex(enc_dict['salt'])
         iv = bytes.fromhex(enc_dict['iv'])
@@ -44,7 +40,8 @@ def decrypt_data(master_key: str, enc_dict: dict):
         key = derive_key(master_key, salt)
         aesgcm = AESGCM(key)
         
-        decrypted_password = aesgcm.decrypt(iv, ciphertext, None)
-        return decrypted_password.decode()
+        # Thư viện tự động tách tag từ ciphertext để xác thực
+        decrypted = aesgcm.decrypt(iv, ciphertext, None)
+        return decrypted.decode()
     except Exception:
         return None

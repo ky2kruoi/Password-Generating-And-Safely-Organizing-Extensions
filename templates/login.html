@@ -3,77 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập - PassManager</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .login-card {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-        .login-card h2 {
-            margin-bottom: 25px;
-            color: #1a1a1a;
-            font-weight: 700;
-        }
-        input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        button:hover {
-            background-color: #1d4ed8;
-        }
-        .footer-text {
-            margin-top: 20px;
-            font-size: 13px;
-            color: #666;
-        }
-    </style>
+    <title>Đăng nhập - PassManager Secured</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
-<body>
-
-    <div class="login-card">
-        <h2>PassManager 🛡️</h2>
-        <p style="color: #666; margin-bottom: 20px;">Vui lòng nhập Khóa Chủ để mở kho dữ liệu</p>
+<body class="center-layout">
+    <div class="card card-narrow" style="text-align: center;">
+        <i class="ph-shield-check" style="font-size: 48px; color: var(--accent-color);"></i>
+        <h2>Chào mừng trở lại!</h2>
+        <p class="subtitle">Nhập Khóa Chủ để mở kho dữ liệu an toàn của bạn.</p>
         
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-error">
+                <i class="ph-warning-circle-bold"></i> {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
         <form action="/login" method="post">
-            <input type="password" name="master_key" placeholder="Nhập Khóa Chủ (Master Key)..." required autofocus>
-            <button type="submit">Mở Kho Khóa</button>
+            <div class="form-group">
+                <label for="mk">Khóa Chủ (Master Key)</label>
+                <div style="position: relative;">
+                     <i class="ph-key" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="password" id="mk" name="master_key" placeholder="Nhập mật khẩu của bạn..." required autofocus style="padding-left: 40px;">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="ph-lock-open-bold"></i> Mở Kho Khóa
+            </button>
         </form>
-
-        <div class="footer-text">
-            Dữ liệu được bảo mật bằng mã hóa AES-256 GCM
-        </div>
     </div>
-
 </body>
 </html>

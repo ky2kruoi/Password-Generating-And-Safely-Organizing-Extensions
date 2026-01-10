@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiết lập - PassManager Secured</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body class="center-layout">
+    <div class="card card-narrow">
+        <div style="text-align: center;">
+            <i class="ph-rocket-launch" style="font-size: 48px; color: var(--accent-color);"></i>
+            <h2>Khởi tạo Kho Khóa</h2>
+            <p class="subtitle">Tạo Khóa Chủ duy nhất để bảo vệ toàn bộ mật khẩu của bạn.</p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="alert alert-error">{{ messages[0] }}</div>
+          {% endif %}
+        {% endwith %}
+
+        <div class="alert alert-error" style="background: #fff7ed; border-color: #ffedd5; color: #9a3412;">
+            <i class="ph-info-bold"></i> 
+            <span style="font-size: 0.9rem;">Quan trọng: Chúng tôi không lưu Khóa Chủ. Nếu quên, bạn sẽ mất toàn bộ dữ liệu!</span>
+        </div>
+        
+        <form method="POST" onsubmit="return validateForm()" style="margin-top: 25px;">
+            <div class="form-group">
+                <label>Khóa Chủ mới</label>
+                <input type="password" id="mk" name="master_key" placeholder="Tạo mật khẩu mạnh..." required>
+            </div>
+            <div class="form-group">
+                <label>Xác nhận lại</label>
+                <input type="password" id="mkc" name="master_key_confirm" placeholder="Nhập lại lần nữa..." required>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="ph-check-circle-bold"></i> Hoàn tất thiết lập
+            </button>
+        </form>
+    </div>
+    <script>
+        function validateForm() {
+            const mk = document.getElementById('mk').value;
+            const mkc = document.getElementById('mkc').value;
+            if (mk !== mkc) { alert("Mật khẩu xác nhận không khớp!"); return false; }
+            return true;
+        }
+    </script>
+</body>
+</html>

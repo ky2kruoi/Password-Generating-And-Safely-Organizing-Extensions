@@ -3,100 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thêm Mật Khẩu Mới - PassManager</title>
-    <style>
-        body { 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-            background-color: #f0f2f5; 
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .container { 
-            max-width: 450px; 
-            width: 90%;
-            background: white; 
-            padding: 40px; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
-        }
-        h2 { font-weight: 800; margin-bottom: 25px; text-align: center; color: #111827; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #4b5563; }
-        input, select { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1px solid #e5e7eb; 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-            font-size: 15px;
-        }
-        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 25px; }
-        .btn { padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; text-align: center; text-decoration: none; }
-        .btn-save { background-color: #2563eb; color: white; }
-        .btn-save:hover { background-color: #1d4ed8; }
-        .btn-gen { background-color: #f1f5f9; color: #475569; border: 1px solid #e5e7eb; }
-        .btn-gen:hover { background-color: #e2e8f0; }
-        .btn-back { background-color: transparent; color: #6b7280; font-size: 14px; }
-    </style>
+    <title>Thêm Mật khẩu - PassManager Secured</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
-<body>
-
-<div class="container">
-    <h2>Thêm Mật Khẩu</h2>
-    
-    <form action="/add" method="post">
-        <div class="form-group">
-            <label for="service">Tên dịch vụ</label>
-            <input type="text" id="service" name="service" placeholder="VD: Facebook, Gmail..." required>
+<body class="center-layout" style="align-items: flex-start; padding-top: 60px;">
+    <div class="card card-narrow">
+        <div style="display: flex; align-items: center; margin-bottom: 30px;">
+            <a href="/dashboard" style="margin-right: 15px; font-size: 1.2rem; color: var(--text-muted);">
+                <i class="ph-arrow-left-bold"></i>
+            </a>
+            <h2 style="margin: 0;">Thêm mục mới</h2>
         </div>
 
-        <div class="form-group">
-            <label for="username">Tên đăng nhập / Email</label>
-            <input type="text" id="username" name="username" required>
-        </div>
-
-        <div class="form-group">
-            <label for="password_type">Lựa chọn kiểu mật khẩu</label>
-            <select id="password_type">
-                <option value="complex">Ký tự phức tạp (H9@kL#m1...)</option>
-                <option value="passphrase">Passphrase NIST (Apple-River-Sky...)</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="password_field">Mật khẩu</label>
-            <input type="text" id="password_field" name="password" placeholder="Nhập hoặc nhấn nút tạo bên dưới" required>
-        </div>
-        
-        <div class="btn-group">
-            <button type="button" class="btn btn-gen" onclick="generatePass()">✨ Tạo mật khẩu tự động</button>
-            <button type="submit" class="btn btn-save">Lưu mật khẩu</button>
-            <a href="/dashboard" class="btn btn-back">Quay lại</a>
-        </div>
-    </form>
-</div>
-
-<script>
-    async function generatePass() {
-        const passField = document.getElementById('password_field');
-        const mode = document.getElementById('password_type').value;
-        
-        try {
-            // Gửi yêu cầu với tham số mode đã chọn
-            const response = await fetch(`/api/generate?mode=${mode}`);
-            const data = await response.json();
+        <form method="POST" action="/add">
+            <div class="form-group">
+                <label for="service"><i class="ph-globe"></i> Dịch vụ / Ứng dụng</label>
+                <input type="text" id="service" name="service" placeholder="VD: Facebook, Gmail..." required autofocus>
+            </div>
             
-            if (data.password) {
-                passField.value = data.password;
-            }
-        } catch (error) {
-            alert("Lỗi kết nối server!");
-        }
-    }
-</script>
+            <div class="form-group">
+                <label for="username"><i class="ph-user"></i> Tên đăng nhập / Email</label>
+                <input type="text" id="username" name="username" placeholder="user@example.com" required>
+            </div>
 
+            <div class="form-group" style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                <label for="password_field" style="color: var(--accent-color);"><i class="ph-lock-key-bold"></i> Mật khẩu</label>
+                
+                <div style="display: flex; gap: 15px; margin-bottom: 15px; font-size: 0.9rem;">
+                    <label style="font-weight: normal; cursor: pointer; display: flex; align-items: center;">
+                        <input type="radio" name="ptype" id="type_complex" value="complex" checked style="margin-right: 8px;"> Ký tự phức tạp
+                    </label>
+                    <label style="font-weight: normal; cursor: pointer; display: flex; align-items: center;">
+                        <input type="radio" name="ptype" id="type_passphrase" value="passphrase" style="margin-right: 8px;"> Cụm từ (Dễ nhớ)
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="password_field" name="password" required style="flex-grow: 1; font-family: monospace;" placeholder="Nhập hoặc tạo tự động...">
+                    <button type="button" class="btn btn-outline btn-gen" onclick="generatePass()" style="white-space: nowrap;">
+                        <i class="ph-magic-wand-bold"></i> Tạo
+                    </button>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 30px;">
+                 <a href="/dashboard" class="btn btn-outline" style="flex: 1;">Hủy bỏ</a>
+                <button type="submit" class="btn btn-primary" style="flex: 2;">
+                    <i class="ph-floppy-disk-bold"></i> Lưu bảo mật
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        async function generatePass() {
+            const btn = document.querySelector('.btn-gen');
+            const icon = btn.querySelector('i');
+            // Lấy giá trị radio button đang được chọn
+            const mode = document.querySelector('input[name="ptype"]:checked').value;
+            
+            btn.disabled = true;
+            icon.classList.replace('ph-magic-wand-bold', 'ph-spinner-gap-bold');
+            icon.classList.add('ph-spin'); // Hiệu ứng xoay icon
+
+            try {
+                const response = await fetch(`/api/generate?mode=${mode}`);
+                const data = await response.json();
+                document.getElementById('password_field').value = data.password;
+            } catch (error) {
+                alert("Lỗi khi gọi API tạo mật khẩu!");
+            } finally {
+                btn.disabled = false;
+                icon.classList.remove('ph-spin');
+                icon.classList.replace('ph-spinner-gap-bold', 'ph-magic-wand-bold');
+            }
+        }
+    </script>
 </body>
 </html>

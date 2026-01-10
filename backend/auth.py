@@ -1,112 +1,60 @@
 import json
 import os
-import getpass  # Giúp ẩn mật khẩu khi nhập
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
+# Cấu hình đường dẫn file vault.json
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+VAULT_FILE = os.path.join(BASE_DIR, "vault.json")
 
-# Lấy đường dẫn của chính file auth.py này
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-# Ghép đường dẫn đó với tên file json
-VAULT_FILE = os.path.join(SCRIPT_DIR, "vault.json")
-
-# Khởi tạo bộ băm mật khẩu Argon2
-# Argon2 tự động xử lý Salt, không cần tạo salt thủ công
 ph = PasswordHasher()
 
-def load_vault():
-    """Đọc dữ liệu từ file vault.json"""
+def is_vault_initialized():
+    """Kiểm tra xem hệ thống đã có người dùng chưa"""
     if not os.path.exists(VAULT_FILE):
-        return None
+        return False
+    data = load_vault()
+    return data is not None and "security_metadata" in data
+
+def load_vault():
+    """Đọc dữ liệu từ file JSON"""
+    if not os.path.exists(VAULT_FILE):
+        return {"security_metadata": {}, "entries": []}
     try:
-        with open(VAULT_FILE, 'r') as f:
+        with open(VAULT_FILE, 'r', encoding='utf-8') as f:
             return json.load(f)
     except (json.JSONDecodeError, IOError):
-        print("Lỗi đọc file dữ liệu!")
-        return None
+        return {"security_metadata": {}, "entries": []}
 
 def save_vault(data):
-    """Ghi dữ liệu Vault (đã cập nhật) vào file vault.json"""
+    """Lưu dữ liệu vào file JSON"""
     try:
-        with open(VAULT_FILE, 'w') as f:
+        with open(VAULT_FILE, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4)
         return True
     except IOError:
-        print("Lỗi: Không thể lưu file dữ liệu.")
         return False
 
-def register():
-    """Chức năng ĐĂNG KÝ (Chạy lần đầu tiên)"""
-    print("--- THIẾT LẬP KHÓA CHỦ (MASTER KEY) ---")
-    print("Đây là lần đầu bạn sử dụng. Hãy tạo mật khẩu chủ.")
-    print("Lưu ý: Nếu quên mật khẩu này, bạn sẽ mất toàn bộ dữ liệu!")
-    
-    while True:
-        # Giúp ẩn ký tự khi gõ
-        password = getpass.getpass("Nhập Khóa Chủ mới: ")
-        confirm = getpass.getpass("Nhập lại Khóa Chủ: ")
-        
-        if password == confirm and len(password) > 0:
-            break
-        print("Mật khẩu không khớp hoặc để trống. Vui lòng thử lại.")
-
-    # --- BĂM MẬT KHẨU ---
-    # Tự động tạo Salt ngẫu nhiên và băm mật khẩu
-    hashed_password = ph.hash(password)
-    
-    # Tạo cấu trúc dữ liệu ban đầu
+def init_vault(master_key):
+    """Trường hợp 1: Thiết lập Khóa chủ cho người dùng mới"""
+    hashed_password = ph.hash(master_key)
     vault_data = {
         "security_metadata": {
             "master_key_hash": hashed_password,
             "algorithm": "argon2",
             "encryption_algorithm": "AES-256-GCM"
         },
-        "entries": [] # Danh sách mật khẩu trống
+        "entries": [] 
     }
-    
-    # Lưu vào file JSON
-    with open(VAULT_FILE, 'w') as f:
-        json.dump(vault_data, f, indent=4)
-    
-    print("\n[THÀNH CÔNG] Đã tạo Khóa Chủ và file vault.json!")
-    return password # Trả về mật khẩu gốc để dùng cho việc tạo khóa mã hóa sau này
+    return save_vault(vault_data)
 
-def login():
-    """Chức năng ĐĂNG NHẬP (Các lần sau)"""
-    print("--- ĐĂNG NHẬP ---")
-    
-    # 1. Tải dữ liệu hash từ file
+def verify_master_key(master_key):
+    """Trường hợp 2: Kiểm tra Khóa chủ cho người dùng cũ"""
     data = load_vault()
-    if not data:
-        return register() # Nếu chưa có file thì chuyển sang đăng ký
-        
-    saved_hash = data['security_metadata']['master_key_hash']
-    
-    # 2. Yêu cầu nhập khóa để kiểm tra
-    input_password = getpass.getpass("Nhập Khóa Chủ của bạn: ")
-    
-    # 3. Kiểm tra khóa (Verify)
+    hashed = data.get("security_metadata", {}).get("master_key_hash")
+    if not hashed:
+        return False
     try:
-        # Hàm verify sẽ so sánh khóa nhập vào với hash đã lưu
-        # Nếu sai, nó sẽ báo lỗi VerifyMismatchError
-        ph.verify(saved_hash, input_password)
-        
-        print("\n[THÀNH CÔNG] Xác thực thành công!")
-        # Nếu thuật toán Argon2 cần cập nhật tham số (rehash), thư viện sẽ báo true
-        if ph.check_needs_rehash(saved_hash):
-            print("Cập nhật lại hash bảo mật hơn...")
-            # Code cập nhật lại hash (chưa hoàn thành ở đây)
-            
-        return input_password # Trả về mật khẩu gốc để dùng tiếp
-        
+        return ph.verify(hashed, master_key)
     except VerifyMismatchError:
-        print("\n[THẤT BẠI] Sai Khóa Chủ! Truy cập bị từ chối.")
-        return None
-
-# --- CHẠY THỬ NGHIỆM ---
-if __name__ == "__main__":
-    # Kiểm tra xem file đã tồn tại chưa để quyết định Register hay Login
-    if not os.path.exists(VAULT_FILE):
-        key = register()
-    else:
-        key = login()
+        return False

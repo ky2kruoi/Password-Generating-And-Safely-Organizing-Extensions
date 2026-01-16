@@ -17,7 +17,7 @@ Bảo mật phiên làm việc: Tự động yêu cầu xác thực lại khi đ
 
 
 
-🛠️ Kiến trúc Bảo mật (Security Stack)
+🛠️ Kiến trúc Bảo mật 
 Dự án được xây dựng dựa trên các thư viện mã hóa chuẩn công nghiệp:
 
 Password Hashing: Sử dụng thuật toán Argon2 để băm Khóa Chủ, chống lại các cuộc tấn công Brute-force.
@@ -62,4 +62,3 @@ Rủi ro mất dữ liệu: Nếu quên Khóa Chủ, bạn sẽ không thể kh�
 
 
 
-Sinh viên thực hiện: Vũ Xuân Kỳ - 20235358 Học phần: Project I - Đại học Bách Khoa Hà Nội

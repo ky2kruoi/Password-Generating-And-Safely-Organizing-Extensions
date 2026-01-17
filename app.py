@@ -66,7 +66,7 @@ def add_api():
         return jsonify({"status": "success"})
     return jsonify({"status": "fail"}), 400
 
-# --- ROUTES CHO WEB LOCAL (SỬA LỖI TẠI ĐÂY) ---
+# --- ROUTES CHO WEB LOCAL ---
 
 @app.route('/')
 def index():

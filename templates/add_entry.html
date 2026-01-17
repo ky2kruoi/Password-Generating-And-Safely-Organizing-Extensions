@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Mới - Secure PassManager</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .pass-card { width: 100%; max-width: 400px; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .logo-title { color: #2563eb; font-weight: bold; font-size: 24px; text-align: center; margin-bottom: 20px; }
+        .btn-generate { background-color: #f1f3f5; border: none; color: #495057; font-weight: 500; margin-bottom: 10px; }
+        .btn-generate:hover { background-color: #e9ecef; }
+        .btn-save { background-color: #2563eb; border: none; font-weight: 600; padding: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="pass-card">
+    <div class="logo-title">PassManager 🛡️</div>
+    
+    <form action="/api/add" method="POST">
+        <div class="mb-3">
+            <input type="text" name="service" class="form-control" placeholder="Tên dịch vụ (VD: Facebook)" required>
+        </div>
+
+        <div class="mb-3">
+            <input type="text" name="username" class="form-control" placeholder="Tên đăng nhập" required>
+        </div>
+
+        <div class="mb-3">
+            <select id="password-mode" class="form-select">
+                <option value="complex">Ký tự phức tạp</option>
+                <option value="passphrase">Cụm từ NIST (Dễ nhớ)</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <input type="text" id="password-field" name="password" class="form-control" placeholder="Mật khẩu" required>
+        </div>
+
+        <button type="button" class="btn btn-generate w-100" onclick="generateAuto()">✨ Tạo tự động</button>
+
+        <button type="submit" class="btn btn-primary btn-save w-100">Lưu bảo mật</button>
+        
+        <div class="text-center mt-3">
+            <a href="/dashboard" class="text-decoration-none text-muted small">← Quay lại kho khóa</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    async function generateAuto() {
+        const mode = document.getElementById('password-mode').value;
+        // Gọi API từ Flask backend
+        const response = await fetch(`/api/generate?mode=${mode}`);
+        const data = await response.json();
+        document.getElementById('password-field').value = data.password;
+    }
+</script>
+
+</body>
+</html>

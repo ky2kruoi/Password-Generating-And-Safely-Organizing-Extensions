@@ -112,6 +112,13 @@ def view_pass(entry_id):
     password = manager.get_decrypted_password(session['master_key'], entry_id)
     return jsonify({"password": password}) if password else (jsonify({"error": "fail"}), 400)
 
+@app.route('/add')
+def add_page():
+    """Hiển thị giao diện thêm mật khẩu trên Web"""
+    if 'master_key' not in session:
+        return redirect(url_for('login'))
+    return render_template('add_entry.html') 
+
 @app.route('/delete/<string:entry_id>')
 def delete_entry(entry_id):
     if 'master_key' not in session: return jsonify({"error": "unauthorized"}), 401
